@@ -1,6 +1,6 @@
 export type View = "issues" | "projects";
 
-export type IssueStatus = "backlog" | "todo" | "in_progress" | "done" | "cancelled";
+export type IssueStatus = "backlog" | "todo" | "in_progress" | "blocked" | "done" | "cancelled";
 export type Priority = "none" | "urgent" | "high" | "medium" | "low";
 export type ProjectStatus = "backlog" | "planned" | "in_progress" | "completed" | "cancelled";
 

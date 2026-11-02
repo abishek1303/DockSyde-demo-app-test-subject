@@ -152,7 +152,7 @@ const listIssues = createRoute({
       page: z.string().optional().openapi({ description: "Page number (default: 1)" }),
       limit: z.string().optional().openapi({ description: "Items per page (default: 50, max: 100)" }),
       search: z.string().optional().openapi({ description: "Search by title or identifier" }),
-      status: z.string().optional().openapi({ description: "Filter by status (todo, in_progress, done, backlog, cancelled)" }),
+      status: z.string().optional().openapi({ description: "Filter by status (todo, in_progress, blocked, done, backlog, cancelled)" }),
       project_id: z.string().optional().openapi({ description: "Filter by project ID" }),
     }),
   },
@@ -209,10 +209,11 @@ app.openapi(listIssues, async (c) => {
        ORDER BY
          CASE i.status
            WHEN 'in_progress' THEN 0
-           WHEN 'todo' THEN 1
-           WHEN 'backlog' THEN 2
-           WHEN 'done' THEN 3
-           WHEN 'cancelled' THEN 4
+           WHEN 'blocked' THEN 1
+           WHEN 'todo' THEN 2
+           WHEN 'backlog' THEN 3
+           WHEN 'done' THEN 4
+           WHEN 'cancelled' THEN 5
          END,
          CASE i.priority
            WHEN 'urgent' THEN 0

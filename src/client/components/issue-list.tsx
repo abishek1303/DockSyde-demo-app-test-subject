@@ -7,7 +7,7 @@ import { Pagination } from "./pagination";
 import { CreateIssue } from "./create-issue";
 import type { IssueStatus } from "../types";
 
-const STATUS_ORDER: IssueStatus[] = ["in_progress", "todo", "backlog", "done", "cancelled"];
+const STATUS_ORDER: IssueStatus[] = ["in_progress", "blocked", "todo", "backlog", "done", "cancelled"];
 
 export function IssueList() {
   const { issues, issuesPag, setIssuesPage, issuesSearch, setIssuesSearch, selectIssue, stats } = useApp();

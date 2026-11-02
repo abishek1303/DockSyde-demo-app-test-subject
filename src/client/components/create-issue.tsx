@@ -3,7 +3,7 @@ import { X } from "lucide-preact";
 import { useApp } from "../context";
 import type { IssueStatus, Priority } from "../types";
 
-const STATUSES: IssueStatus[] = ["backlog", "todo", "in_progress", "done"];
+const STATUSES: IssueStatus[] = ["backlog", "todo", "in_progress", "blocked", "done"];
 const PRIORITIES: Priority[] = ["none", "urgent", "high", "medium", "low"];
 
 export function CreateIssue({ onClose }: { onClose: () => void }) {

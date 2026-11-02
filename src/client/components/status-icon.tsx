@@ -4,6 +4,7 @@ const STATUS_COLORS: Record<IssueStatus, string> = {
   backlog: "#9ca3af",
   todo: "#f2994a",
   in_progress: "#2563eb",
+  blocked: "#dc2626",
   done: "#16a34a",
   cancelled: "#9ca3af",
 };
@@ -12,6 +13,7 @@ const STATUS_LABELS: Record<IssueStatus, string> = {
   backlog: "Backlog",
   todo: "Todo",
   in_progress: "In Progress",
+  blocked: "Blocked",
   done: "Done",
   cancelled: "Cancelled",
 };
@@ -20,6 +22,15 @@ export function StatusIcon({ status, size = 14 }: { status: IssueStatus; size?: 
   const color = STATUS_COLORS[status] || "#9ca3af";
   const half = size / 2;
   const r = half - 1.5;
+
+  if (status === "blocked") {
+    return (
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} fill="none" aria-label={STATUS_LABELS[status]}>
+        <circle cx={half} cy={half} r={r} stroke={color} stroke-width="1.5" />
+        <line x1={size * 0.3} y1={half} x2={size * 0.7} y2={half} stroke={color} stroke-width="1.5" stroke-linecap="round" />
+      </svg>
+    );
+  }
 
   if (status === "done") {
     return (

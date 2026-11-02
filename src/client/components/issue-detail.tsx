@@ -6,7 +6,7 @@ import { PriorityIcon, priorityLabel } from "./priority-icon";
 import { LabelPill } from "./label-pill";
 import type { IssueStatus, Priority } from "../types";
 
-const STATUSES: IssueStatus[] = ["backlog", "todo", "in_progress", "done", "cancelled"];
+const STATUSES: IssueStatus[] = ["backlog", "todo", "in_progress", "blocked", "done", "cancelled"];
 const PRIORITIES: Priority[] = ["none", "urgent", "high", "medium", "low"];
 
 export function IssueDetail() {
