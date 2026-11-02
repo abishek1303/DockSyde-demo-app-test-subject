@@ -103,6 +103,12 @@ export function IssueDetail() {
           </h1>
         )}
 
+        {issue.status === "blocked" && (
+          <p role="note" aria-label="Blocked issue guidance">
+            Blocked: work is paused while a dependency is unresolved. Change the issue status when work can continue.
+          </p>
+        )}
+
         {/* Description */}
         {editing === "description" ? (
           <div>
