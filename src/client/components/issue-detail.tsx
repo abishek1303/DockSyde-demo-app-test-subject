@@ -21,6 +21,7 @@ export function IssueDetail() {
   const [editTitle, setEditTitle] = useState("");
   const [editDesc, setEditDesc] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [resuming, setResuming] = useState(false);
 
   if (!issue) return null;
 
@@ -34,6 +35,13 @@ export function IssueDetail() {
   const handleSaveDesc = async () => {
     try { await updateIssue(issue.id, { description: editDesc }); } catch (e) { setError((e as Error).message); }
     setEditing(null);
+  };
+
+  const handleResume = async () => {
+    setResuming(true);
+    try { await updateIssue(issue.id, { status: "in_progress" }); }
+    catch (e) { setError((e as Error).message); }
+    finally { setResuming(false); }
   };
 
   const handleComment = async () => {
@@ -104,9 +112,14 @@ export function IssueDetail() {
         )}
 
         {issue.status === "blocked" && (
-          <p role="note" aria-label="Blocked issue guidance">
-            Blocked: work is paused while a dependency is unresolved. Change the issue status when work can continue.
-          </p>
+          <div>
+            <p role="note" aria-label="Blocked issue guidance">
+              Blocked: work is paused while a dependency is unresolved. Change the issue status when work can continue.
+            </p>
+            <button type="button" class="btn btn-sm btn-primary" aria-label="Resume blocked issue" disabled={resuming} onClick={handleResume}>
+              {resuming ? "Resuming…" : "Resume work"}
+            </button>
+          </div>
         )}
 
         {/* Description */}
