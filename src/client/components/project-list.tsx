@@ -104,6 +104,7 @@ export function ProjectList() {
                           </span>
                         )}
                       </div>
+                      {p.description && <p class="project-description muted">{p.description}</p>}
                     </td>
                     <td>
                       <select

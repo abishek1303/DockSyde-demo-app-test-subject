@@ -781,7 +781,8 @@ tr:hover td {
 }
 
 .create-form-field input,
-.create-form-field select {
+.create-form-field select,
+.create-form-field textarea {
   font-family: var(--font);
   font-size: 13px;
   padding: 7px 10px;
@@ -794,7 +795,8 @@ tr:hover td {
   color: var(--text);
 }
 .create-form-field input:focus,
-.create-form-field select:focus {
+.create-form-field select:focus,
+.create-form-field textarea:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(94, 106, 210, 0.1);
 }
@@ -910,3 +912,5 @@ tr:hover .actions-cell { opacity: 1; }
 .demo-board .issue-row { display:flex; flex-wrap:wrap; height:auto; min-height:100px; padding:14px; gap:8px; }
 .demo-board .issue-row-title { flex-basis:100%; white-space:normal; text-align:left; }
 .demo-board .issue-row-meta { flex-basis:100%; }
+
+.project-description { margin: 6px 0 0; max-width: 32rem; white-space: pre-wrap; overflow-wrap: anywhere; }

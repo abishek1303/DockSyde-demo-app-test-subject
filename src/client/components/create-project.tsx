@@ -9,16 +9,20 @@ const PRIORITIES: Priority[] = ["none", "urgent", "high", "medium", "low"];
 export function CreateProject({ onClose }: { onClose: () => void }) {
   const { addProject, setError } = useApp();
   const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<ProjectStatus>("planned");
   const [priority, setPriority] = useState<Priority>("none");
   const [lead, setLead] = useState("");
   const [targetDate, setTargetDate] = useState("");
 
   const handleSubmit = async () => {
-    if (!name.trim()) return;
+    if (!name.trim() || saving) return;
+    setSaving(true);
     try {
       await addProject({
         name: name.trim(),
+        description: description.trim(),
         status,
         priority,
         lead: lead.trim(),
@@ -27,6 +31,8 @@ export function CreateProject({ onClose }: { onClose: () => void }) {
       onClose();
     } catch (e) {
       setError((e as Error).message);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -50,6 +56,10 @@ export function CreateProject({ onClose }: { onClose: () => void }) {
             autoFocus
             aria-label="Project name"
           />
+        </div>
+        <div class="create-form-field create-form-field-wide">
+          <label for="project-description">Description (optional)</label>
+          <textarea id="project-description" value={description} onInput={(e) => setDescription(e.currentTarget.value)} rows={3} placeholder="What is this project trying to achieve?" />
         </div>
         <div class="create-form-field">
           <label>Status</label>
@@ -84,8 +94,8 @@ export function CreateProject({ onClose }: { onClose: () => void }) {
         </div>
       </div>
       <div class="create-form-actions">
-        <button class="btn btn-primary" onClick={handleSubmit} disabled={!name.trim()} aria-label="Create project">
-          Create Project
+        <button class="btn btn-primary" onClick={handleSubmit} disabled={!name.trim() || saving} aria-label="Create project">
+          {saving ? "Creating…" : "Create Project"}
         </button>
       </div>
     </div>
