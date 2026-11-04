@@ -10,7 +10,8 @@ import type { IssueStatus } from "../types";
 const STATUS_ORDER: IssueStatus[] = ["in_progress", "todo", "backlog", "done", "cancelled"];
 
 export function IssueList() {
-  const { issues, issuesPag, setIssuesPage, issuesSearch, setIssuesSearch, selectIssue, stats } = useApp();
+  const { issues, issuesPag, setIssuesPage, issuesSearch, setIssuesSearch, selectIssue, stats, filters, setFilters, projectLookup } = useApp();
+  const [layout, setLayout] = useState("list");
   const [searchValue, setSearchValue] = useState("");
   const [showCreate, setShowCreate] = useState(false);
   const [collapsed, setCollapsed] = useState<Set<IssueStatus>>(new Set());
@@ -69,7 +70,28 @@ export function IssueList() {
 
       {showCreate && <CreateIssue onClose={() => setShowCreate(false)} />}
 
-      <div class="issue-groups">
+      <div class="demo-filters">
+        <select aria-label="Filter status" value={filters.status} onChange={e => setFilters({ ...filters, status: e.currentTarget.value })}>
+          <option value="">All statuses</option>{STATUS_ORDER.map(s => <option value={s}>{statusLabel(s)}</option>)}
+        </select>
+        <select aria-label="Filter priority" value={filters.priority} onChange={e => setFilters({ ...filters, priority: e.currentTarget.value })}>
+          <option value="">All priorities</option>{["urgent", "high", "medium", "low", "none"].map(p => <option value={p}>{p}</option>)}
+        </select>
+        <select aria-label="Filter project" value={filters.project_id} onChange={e => setFilters({ ...filters, project_id: e.currentTarget.value })}>
+          <option value="">All projects</option>{projectLookup.map(p => <option value={p.id}>{p.name}</option>)}
+        </select>
+        <label><input type="checkbox" checked={!!filters.overdue} onChange={e => setFilters({ ...filters, overdue: e.currentTarget.checked ? "true" : "" })} /> Overdue only</label>
+        <button class="btn" onClick={() => { setFilters({status: "", priority: "", project_id: "", overdue: ""}); handleSearch(""); }}>Clear filters</button>
+        <button class="btn" aria-pressed={layout === "board"} onClick={() => setLayout(layout === "list" ? "board" : "list")}>{layout === "list" ? "Board view" : "List view"}</button>
+      </div>
+      <div class="demo-summary" aria-live="polite">
+        <strong>{issuesPag.total} matching issues</strong>
+        <span>On this page: {issues.filter(i => i.status === "in_progress").length} in progress</span>
+        <span>{issues.filter(i => i.status === "done").length} completed</span>
+        <span>{issues.filter(i => ["urgent", "high"].includes(i.priority) && !["done", "cancelled"].includes(i.status)).length} need attention</span>
+      </div>
+      {issues.length === 0 && <p class="empty-group">No matching issues. Clear the filters or create an issue to get started.</p>}
+      <div class={layout === "board" ? "issue-groups demo-board" : "issue-groups"}>
         {STATUS_ORDER.map((status) => {
           const group = grouped.get(status) || [];
           if (group.length === 0 && issuesSearch) return null;

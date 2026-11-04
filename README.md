@@ -36,3 +36,11 @@ branches: the two branches intentionally differ.
 
 `pnpm build` creates `dist/`. Append `?agent` for browser automation controls.
 See `agent.md` for app capabilities. MIT licensed; based on Clawnify OpenTodo.
+
+## changes-test showcase
+
+Combine status, priority, project, and overdue filters with search. Filters run
+on the API before pagination. Toggle Board view to see status columns; click
+a card to edit it. The summary shows matching totals and explicitly page-scoped
+workload counts. Clear filters restores the full list. Overdue excludes done
+and cancelled issues and compares dates in UTC.
