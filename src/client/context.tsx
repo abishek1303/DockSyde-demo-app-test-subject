@@ -12,6 +12,8 @@ export interface AppContextValue {
   stats: Stats;
 
   // Issues
+  filters: { status: string; priority: string; project_id: string; overdue: string };
+  setFilters: (filters: { status: string; priority: string; project_id: string; overdue: string }) => void;
   issues: Issue[];
   issuesPag: PaginatedState;
   setIssuesPage: (page: number) => void;

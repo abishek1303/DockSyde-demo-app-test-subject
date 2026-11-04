@@ -153,6 +153,8 @@ const listIssues = createRoute({
       limit: z.string().optional().openapi({ description: "Items per page (default: 50, max: 100)" }),
       search: z.string().optional().openapi({ description: "Search by title or identifier" }),
       status: z.string().optional().openapi({ description: "Filter by status (todo, in_progress, done, backlog, cancelled)" }),
+      priority: z.enum(["urgent", "high", "medium", "low", "none"]).optional(),
+      overdue: z.enum(["true"]).optional(),
       project_id: z.string().optional().openapi({ description: "Filter by project ID" }),
     }),
   },
@@ -188,6 +190,11 @@ app.openapi(listIssues, async (c) => {
       whereClauses.push("i.status = ?");
       whereParams.push(q.status);
     }
+    if (q.priority) {
+      whereClauses.push("i.priority = ?");
+      whereParams.push(q.priority);
+    }
+    if (q.overdue) whereClauses.push("i.due_date < date('now') AND i.due_date != '' AND i.status NOT IN ('done', 'cancelled')");
     if (q.project_id) {
       whereClauses.push("i.project_id = ?");
       whereParams.push(parseInt(q.project_id, 10));

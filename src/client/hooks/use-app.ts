@@ -13,6 +13,8 @@ export function useAppState(isAgent: boolean): AppContextValue {
   const [loading, setLoading] = useState(true);
 
   // Issues
+  const [filters, setFiltersState] = useState({ status: "", priority: "", project_id: "", overdue: "" });
+  const setFilters = (next: typeof filters) => { setFiltersState(next); setIssuesPag(prev => ({ ...prev, page: 1 })); };
   const [issues, setIssues] = useState<Issue[]>([]);
   const [issuesPag, setIssuesPag] = useState<PaginatedState>({ page: 1, limit: 50, total: 0 });
   const [issuesSearch, setIssuesSearch] = useState("");
@@ -41,11 +43,12 @@ export function useAppState(isAgent: boolean): AppContextValue {
       limit: String(pag.limit),
     });
     if (search) params.set("search", search);
+    for (const [key, value] of Object.entries(filters)) if (value) params.set(key, value);
 
     const data = await api<{ issues: Issue[]; total: number }>("GET", `/api/issues?${params}`);
     setIssues(data.issues);
     setIssuesPag((prev) => ({ ...prev, total: data.total }));
-  }, []);
+  }, [filters]);
 
   const fetchProjects = useCallback(async (pag: PaginatedState) => {
     const params = new URLSearchParams({
@@ -91,7 +94,7 @@ export function useAppState(isAgent: boolean): AppContextValue {
 
   useEffect(() => {
     fetchIssues(issuesPag, issuesSearch).catch((err) => setError((err as Error).message));
-  }, [issuesPag.page, issuesSearch]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [issuesPag.page, issuesSearch, filters]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     fetchProjects(projectsPag).catch((err) => setError((err as Error).message));
@@ -195,7 +198,7 @@ export function useAppState(isAgent: boolean): AppContextValue {
 
   return {
     view, setView, isAgent, stats,
-    issues, issuesPag, setIssuesPage, issuesSearch, setIssuesSearch,
+    issues, issuesPag, setIssuesPage, issuesSearch, setIssuesSearch: (value: string) => { setIssuesSearch(value); setIssuesPage(1); }, filters, setFilters,
     addIssue, updateIssue, deleteIssue,
     selectedIssue, selectIssue,
     addComment, deleteComment,

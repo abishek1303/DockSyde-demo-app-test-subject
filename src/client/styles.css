@@ -899,3 +899,14 @@ tr:hover .actions-cell { opacity: 1; }
 .sidebar::-webkit-scrollbar { width: 4px; }
 .sidebar::-webkit-scrollbar-track { background: transparent; }
 .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* Feature showcase: responsive filters and status board. */
+.demo-filters { display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:16px 24px; border-bottom:1px solid var(--border, #ddd); }
+.demo-filters select { padding:8px; border:1px solid #bbb; border-radius:6px; background:inherit; color:inherit; }
+.demo-filters label { display:flex; align-items:center; gap:6px; }
+.demo-summary { display:flex; flex-wrap:wrap; gap:24px; padding:18px 24px; background:rgba(99,102,241,.07); }
+.demo-board { display:flex; gap:16px; padding:20px; overflow-x:auto; align-items:flex-start; }
+.demo-board .issue-group { flex:0 0 290px; border:1px solid #aaa5; border-radius:8px; overflow:hidden; }
+.demo-board .issue-row { display:flex; flex-wrap:wrap; height:auto; min-height:100px; padding:14px; gap:8px; }
+.demo-board .issue-row-title { flex-basis:100%; white-space:normal; text-align:left; }
+.demo-board .issue-row-meta { flex-basis:100%; }
