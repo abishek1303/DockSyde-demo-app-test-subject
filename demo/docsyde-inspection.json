@@ -1,8 +1,8 @@
 {
   "repository": "https://github.com/abishek1303/docksyde-demo-app-test-subject",
   "id": "request-desk-product-improvements",
-  "version": "1",
-  "description": "Read-only list, search feedback, board, and new-project form checkpoints. Does not create records.",
+  "version": "2",
+  "description": "Read-only issue list, expanded issue intake form, search, board, and project creation checkpoints. Does not create records.",
   "runtime": {
     "mode": "attach",
     "options": {
@@ -17,6 +17,21 @@
     "steps": [
       {
         "type": "checkpoint"
+      },
+      {
+        "type": "click",
+        "selector": "button[aria-label=\"New issue\"]"
+      },
+      {
+        "type": "waitFor",
+        "selector": "#issue-due-date"
+      },
+      {
+        "type": "checkpoint"
+      },
+      {
+        "type": "click",
+        "selector": "button[aria-label=\"Cancel\"]"
       },
       {
         "type": "fill",
@@ -65,8 +80,8 @@
       "input, textarea"
     ],
     "limits": {
-      "maxCheckpoints": 16,
-      "maxStates": 32,
+      "maxCheckpoints": 20,
+      "maxStates": 40,
       "maxScreenshotBytes": 8388608,
       "timeoutMs": 45000
     }
@@ -79,12 +94,12 @@
     {
       "id": "issue-search-project-creation",
       "pathname": "/",
-      "description": "Inspect search feedback, board layout, and optional project description form without saving data."
+      "description": "Inspect issue intake description/due date, search feedback, board layout, and project description form without saving records."
     }
   ],
   "supportingSourcePaths": [
+    "src/client/components/create-issue.tsx",
     "src/client/components/issue-list.tsx",
-    "src/client/components/create-project.tsx",
-    "src/client/components/project-list.tsx"
+    "src/client/components/create-project.tsx"
   ]
 }

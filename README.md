@@ -57,3 +57,13 @@ Descriptions persist through the existing project API and appear below the proje
 name in the table, including after reload. Name remains required.
 
 See [SETUP.md](SETUP.md) for pinned demo revisions and inspection checkpoints.
+
+
+## Issue intake (changes-test)
+
+New Issue now accepts an optional description and due date alongside title,
+status, priority, and project. Describe the request and expected outcome before
+creating it, and optionally set its deadline. The existing issue API persists
+both values; the description appears in issue details and the due date appears
+in the list and existing editable due-date control. Empty values remain allowed.
+Create Issue shows Creating… and disables repeated submission while saving.

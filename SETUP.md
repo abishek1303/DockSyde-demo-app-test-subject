@@ -41,3 +41,22 @@ after reload. Verification records were removed; existing local data was preserv
 The existing deterministic capture also completed: 10 retained checkpoints, no
 omitted states/checkpoints, HTTP 200, and zero page errors. One bounded DOM snapshot
 was truncated; screenshots and the final project form checkpoint were retained.
+
+
+## Latest Changes demo: issue intake
+
+`main` remains the successful full-scan state at
+`f2915461556be12a3f2a7ec5e03663d37344e123`. The existing `changes-test` branch
+contains the new issue description/due-date inputs; compare that main revision
+with the committed changes-test head. The same main revision is preserved as
+`demo/change-test-baseline-2026-11-04`.
+
+At `/?agent`, click New Issue to see Description (optional) and Due date
+(optional). Create an issue, open it, and reload to verify the saved context and
+deadline. `demo/docsyde-inspection.json` version 2 captures the form without
+creating records. Source, API, and startup responsibilities stay unchanged.
+No schema migration, package changes, or dependency installation are required.
+
+Verification: production build and Playwright intake checks passed, including
+blank optional fields, required title, and saved values after reload. Existing
+TypeScript diagnostics remain identical (15 server errors).
