@@ -1,0 +1,90 @@
+{
+  "repository": "https://github.com/abishek1303/docksyde-demo-app-test-subject",
+  "id": "request-desk-product-improvements",
+  "version": "1",
+  "description": "Read-only list, search feedback, board, and new-project form checkpoints. Does not create records.",
+  "runtime": {
+    "mode": "attach",
+    "options": {
+      "baseUrl": "http://localhost:5173",
+      "readinessPath": "/api/stats",
+      "startupTimeoutMs": 60000
+    }
+  },
+  "workflow": {
+    "path": "/?agent",
+    "readySelector": "button[aria-label=\"New issue\"]",
+    "steps": [
+      {
+        "type": "checkpoint"
+      },
+      {
+        "type": "fill",
+        "selector": "input[aria-label=\"Search issues\"]",
+        "value": "launch"
+      },
+      {
+        "type": "waitFor",
+        "selector": "button[aria-label=\"Clear search\"]"
+      },
+      {
+        "type": "checkpoint"
+      },
+      {
+        "type": "click",
+        "selector": "button[aria-label=\"Clear search\"]"
+      },
+      {
+        "type": "click",
+        "selector": "button[aria-pressed]"
+      },
+      {
+        "type": "waitFor",
+        "selector": ".demo-board"
+      },
+      {
+        "type": "checkpoint"
+      },
+      {
+        "type": "click",
+        "selector": "button[aria-label=\"View Projects\"]"
+      },
+      {
+        "type": "click",
+        "selector": "button[aria-label=\"New project\"]"
+      },
+      {
+        "type": "waitFor",
+        "selector": "#project-description"
+      },
+      {
+        "type": "checkpoint"
+      }
+    ],
+    "sensitiveSelectors": [
+      "input, textarea"
+    ],
+    "limits": {
+      "maxCheckpoints": 16,
+      "maxStates": 32,
+      "maxScreenshotBytes": 8388608,
+      "timeoutMs": 45000
+    }
+  },
+  "maxSelectedScreenshots": 2,
+  "supportedPathnames": [
+    "/"
+  ],
+  "capabilities": [
+    {
+      "id": "issue-search-project-creation",
+      "pathname": "/",
+      "description": "Inspect search feedback, board layout, and optional project description form without saving data."
+    }
+  ],
+  "supportingSourcePaths": [
+    "src/client/components/issue-list.tsx",
+    "src/client/components/create-project.tsx",
+    "src/client/components/project-list.tsx"
+  ]
+}
