@@ -1,8 +1,8 @@
 {
   "repository": "https://github.com/abishek1303/docksyde-demo-app-test-subject",
   "id": "request-desk-product-improvements",
-  "version": "2",
-  "description": "Read-only issue list, expanded issue intake form, search, board, and project creation checkpoints. Does not create records.",
+  "version": "3",
+  "description": "Read-only workload overview, bulk-triage controls, issue intake, search, board, and project form checkpoints. No records are created or updated.",
   "runtime": {
     "mode": "attach",
     "options": {
@@ -17,6 +17,25 @@
     "steps": [
       {
         "type": "checkpoint"
+      },
+      {
+        "type": "click",
+        "selector": "button[aria-label=\"View Workload\"]"
+      },
+      {
+        "type": "waitFor",
+        "selector": ".workload-panels"
+      },
+      {
+        "type": "checkpoint"
+      },
+      {
+        "type": "click",
+        "selector": "button[aria-label=\"View My Issues\"]"
+      },
+      {
+        "type": "waitFor",
+        "selector": "section[aria-label=\"Bulk triage\"]"
       },
       {
         "type": "click",
@@ -80,26 +99,31 @@
       "input, textarea"
     ],
     "limits": {
-      "maxCheckpoints": 20,
-      "maxStates": 40,
+      "maxCheckpoints": 24,
+      "maxStates": 48,
       "maxScreenshotBytes": 8388608,
       "timeoutMs": 45000
     }
   },
-  "maxSelectedScreenshots": 2,
+  "maxSelectedScreenshots": 3,
   "supportedPathnames": [
     "/"
   ],
   "capabilities": [
     {
-      "id": "issue-search-project-creation",
+      "id": "workload-planning",
       "pathname": "/",
-      "description": "Inspect issue intake description/due date, search feedback, board layout, and project description form without saving records."
+      "description": "Inspect workspace-wide workload metrics, issue status breakdown, active deadline queue and drill-down controls."
+    },
+    {
+      "id": "issue-triage",
+      "pathname": "/",
+      "description": "Inspect bulk status/priority controls, issue intake fields, description search and board layout without changing records."
     }
   ],
   "supportingSourcePaths": [
-    "src/client/components/create-issue.tsx",
+    "src/client/components/workload-overview.tsx",
     "src/client/components/issue-list.tsx",
-    "src/client/components/create-project.tsx"
+    "src/server/index.ts"
   ]
 }

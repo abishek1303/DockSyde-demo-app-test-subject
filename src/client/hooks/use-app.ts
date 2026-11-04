@@ -7,7 +7,7 @@ import type {
 import type { AppContextValue } from "../context";
 
 export function useAppState(isAgent: boolean): AppContextValue {
-  const [view, setView] = useState<View>(() => new URLSearchParams(window.location.search).get("view") === "projects" ? "projects" : "issues");
+  const [view, setView] = useState<View>(() => { const value = new URLSearchParams(window.location.search).get("view"); return value === "projects" || value === "overview" ? value : "issues"; });
   const [stats, setStats] = useState<Stats>({ issues: 0, projects: 0, labels: 0 });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -107,7 +107,14 @@ export function useAppState(isAgent: boolean): AppContextValue {
   }, []);
 
   const addIssue = useCallback(async (data: { title: string; description?: string; status?: IssueStatus; priority?: Priority; project_id?: number | null; due_date?: string }) => {
-    await api("POST", "/api/issues", data);
+    const result = await api<{ issue: Issue }>("POST", "/api/issues", data);
+    await fetchIssues(issuesPag, issuesSearch);
+    await fetchStats();
+    return result.issue;
+  }, [issuesPag, issuesSearch, fetchIssues, fetchStats]);
+
+  const bulkUpdateIssues = useCallback(async (ids: number[], data: { status?: IssueStatus; priority?: Priority }) => {
+    await api("POST", "/api/issues/bulk", { ids, ...data });
     await fetchIssues(issuesPag, issuesSearch);
     await fetchStats();
   }, [issuesPag, issuesSearch, fetchIssues, fetchStats]);
@@ -199,7 +206,7 @@ export function useAppState(isAgent: boolean): AppContextValue {
   return {
     view, setView, isAgent, stats,
     issues, issuesPag, setIssuesPage, issuesSearch, setIssuesSearch: (value: string) => { setIssuesSearch(value); setIssuesPage(1); }, filters, setFilters,
-    addIssue, updateIssue, deleteIssue,
+    addIssue, updateIssue, deleteIssue, bulkUpdateIssues,
     selectedIssue, selectIssue,
     addComment, deleteComment,
     addIssueLabel, removeIssueLabel,

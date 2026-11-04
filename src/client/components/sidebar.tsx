@@ -1,9 +1,10 @@
 import { AppNav, embedded, reportLocation } from "@clawnify/app/client";
-import { CircleCheck, ListTodo, FolderKanban } from "lucide-preact";
+import { CircleCheck, ListTodo, FolderKanban, ChartColumn } from "lucide-preact";
 import { useApp } from "../context";
 import type { View } from "../types";
 
 const NAV_ITEMS: { view: View; label: string; icon: typeof ListTodo }[] = [
+  { view: "overview", label: "Workload", icon: ChartColumn },
   { view: "issues", label: "My Issues", icon: ListTodo },
   { view: "projects", label: "Projects", icon: FolderKanban },
 ];
@@ -12,6 +13,7 @@ export function Sidebar() {
   const { view, setView, stats, selectedIssue, selectIssue } = useApp();
 
   const counts: Record<View, number> = {
+    overview: stats.issues,
     issues: stats.issues,
     projects: stats.projects,
   };
@@ -27,7 +29,7 @@ export function Sidebar() {
 
   if (embedded) return <AppNav title="Todo" icon="list-checks" active={view}
     groups={[{ items: NAV_ITEMS.map(item => ({ id: item.view, label: item.label,
-      href: `/?view=${item.view}`, icon: item.view === "issues" ? "list-checks" : "folder",
+      href: `/?view=${item.view}`, icon: item.view === "issues" ? "list-checks" : item.view === "overview" ? "chart-column" : "folder",
       count: counts[item.view], home: item.view === "issues" })) }]}
     onNavigate={item => handleNav(item.id as View)} />;
 

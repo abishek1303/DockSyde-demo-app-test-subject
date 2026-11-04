@@ -67,3 +67,48 @@ creating it, and optionally set its deadline. The existing issue API persists
 both values; the description appears in issue details and the due date appears
 in the list and existing editable due-date control. Empty values remain allowed.
 Create Issue shows Creating… and disables repeated submission while saving.
+
+
+## Search request details
+
+Issue search now matches descriptions as well as titles and identifiers. Find a
+request using customer context or an expected outcome entered during creation,
+even if those words are absent from its title. Search still combines with status,
+priority, project, and overdue filters before pagination.
+
+
+## Workload overview
+
+Open Workload in the workspace navigation (`/?agent&view=overview`) for live
+workspace-wide active, overdue, next-seven-days, and no-project counts. Done and
+Cancelled issues are excluded from active/deadline counts. Status breakdowns
+include every issue, not just the current list page. Select a status or Review
+overdue issues to open the corresponding filtered list. The deadline queue shows
+the ten earliest active deadlines through seven days from today, including late
+work; selecting one opens its editable issue detail. Dates use UTC. Refresh
+workload reloads the data and lets you retry a failed load.
+
+## Bulk triage
+
+In My Issues, select individual issues or Select page, then choose a status,
+priority, or both and Apply to selected. Keep status / Keep priority preserve
+that field. Selection is limited to the current page and clears when filters or
+pagination change. The API validates 1–100 issue IDs and applies the changes in
+one atomic statement. If any selected issue was removed, none are updated.
+Failures retain the selection for correction or retry; successful edits refresh
+the list and counts. No bulk deletion or automatic status transitions occur.
+
+## Duplicate a request
+
+Open an issue and select Duplicate issue. A reviewable creation form copies its
+title (prefixed with Copy of), description, priority, and project. The copy starts
+at Todo with an empty due date; comments and labels are not copied. Edit any
+fields, then Create Issue to save and open the new issue with its own identifier.
+Cancel creates nothing and the original remains unchanged.
+
+## Maintain project descriptions
+
+In Projects, use Add description / Edit description beneath a project name.
+Save description persists the edited brief; Cancel description edit discards the
+draft. Clear and save to remove a description. A failed save retains the draft
+for retry. This uses the existing project update endpoint.

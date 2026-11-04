@@ -25,6 +25,9 @@ export function ProjectList() {
   const [showCreate, setShowCreate] = useState(false);
   const [confirmId, setConfirmId] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [descriptionId, setDescriptionId] = useState<number | null>(null);
+  const [description, setDescription] = useState("");
+  const [savingDescription, setSavingDescription] = useState(false);
   const [editName, setEditName] = useState("");
 
   const handleDelete = async (id: number) => {
@@ -41,6 +44,16 @@ export function ProjectList() {
       try { await updateProject(id, { name: editName.trim() }); } catch (e) { setError((e as Error).message); }
     }
     setEditingId(null);
+  };
+
+  const saveDescription = async () => {
+    if (descriptionId === null || savingDescription) return;
+    setSavingDescription(true);
+    try {
+      await updateProject(descriptionId, { description: description.trim() });
+      setDescriptionId(null);
+    } catch (e) { setError((e as Error).message); }
+    finally { setSavingDescription(false); }
   };
 
   return (
@@ -104,7 +117,21 @@ export function ProjectList() {
                           </span>
                         )}
                       </div>
-                      {p.description && <p class="project-description muted">{p.description}</p>}
+                      {descriptionId === p.id ? (
+                        <div class="create-form-field project-description">
+                          <label for={`project-description-${p.id}`}>Project description</label>
+                          <textarea id={`project-description-${p.id}`} rows={3} value={description} onInput={e => setDescription(e.currentTarget.value)} disabled={savingDescription} autoFocus />
+                          <div class="create-form-actions">
+                            <button class="btn btn-sm btn-primary" disabled={savingDescription} onClick={saveDescription}>{savingDescription ? "Saving…" : "Save description"}</button>
+                            <button class="btn btn-sm" disabled={savingDescription} onClick={() => setDescriptionId(null)}>Cancel description edit</button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div class="project-description">
+                          {p.description && <p class="muted">{p.description}</p>}
+                          <button class="btn btn-sm" aria-label={`Edit description for ${p.name}`} onClick={() => { setDescriptionId(p.id); setDescription(p.description); }}>{p.description ? "Edit description" : "Add description"}</button>
+                        </div>
+                      )}
                     </td>
                     <td>
                       <select

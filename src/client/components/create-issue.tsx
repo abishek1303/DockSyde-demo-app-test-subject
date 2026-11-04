@@ -1,26 +1,26 @@
 import { useState } from "preact/hooks";
 import { X } from "lucide-preact";
 import { useApp } from "../context";
-import type { IssueStatus, Priority } from "../types";
+import type { Issue, IssueStatus, Priority } from "../types";
 
 const STATUSES: IssueStatus[] = ["backlog", "todo", "in_progress", "done"];
 const PRIORITIES: Priority[] = ["none", "urgent", "high", "medium", "low"];
 
-export function CreateIssue({ onClose }: { onClose: () => void }) {
+export function CreateIssue({ onClose, initialIssue, onCreated }: { onClose: () => void; initialIssue?: Issue; onCreated?: (id: number) => Promise<void> }) {
   const { addIssue, projectLookup, setError } = useApp();
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [title, setTitle] = useState(initialIssue ? `Copy of ${initialIssue.title}` : "");
+  const [description, setDescription] = useState(initialIssue?.description ?? "");
   const [dueDate, setDueDate] = useState("");
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<IssueStatus>("todo");
-  const [priority, setPriority] = useState<Priority>("none");
-  const [projectId, setProjectId] = useState<string>("");
+  const [priority, setPriority] = useState<Priority>(initialIssue?.priority ?? "none");
+  const [projectId, setProjectId] = useState<string>(initialIssue?.project_id ? String(initialIssue.project_id) : "");
 
   const handleSubmit = async () => {
     if (!title.trim() || saving) return;
     setSaving(true);
     try {
-      await addIssue({
+      const created = await addIssue({
         title: title.trim(),
         description: description.trim(),
         due_date: dueDate,
@@ -28,6 +28,7 @@ export function CreateIssue({ onClose }: { onClose: () => void }) {
         priority,
         project_id: projectId ? parseInt(projectId, 10) : null,
       });
+      if (onCreated) await onCreated(created.id);
       onClose();
     } catch (e) {
       setError((e as Error).message);
@@ -39,11 +40,12 @@ export function CreateIssue({ onClose }: { onClose: () => void }) {
   return (
     <div class="create-form-bar">
       <div class="create-form-header">
-        <span class="create-form-title">New Issue</span>
+        <span class="create-form-title">{initialIssue ? "Duplicate Issue" : "New Issue"}</span>
         <button class="btn btn-sm" onClick={onClose} aria-label="Cancel">
           <X size={14} />
         </button>
       </div>
+      {initialIssue && <p class="muted">Review the copy before creating it. Status starts at Todo; due date, labels, and comments are not copied.</p>}
       <div class="create-form-grid">
         <div class="create-form-field create-form-field-wide">
           <label>Title</label>

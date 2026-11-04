@@ -3,6 +3,7 @@ import { ArrowLeft, Trash2, Send, X } from "lucide-preact";
 import { useApp } from "../context";
 import { StatusIcon, statusLabel } from "./status-icon";
 import { PriorityIcon, priorityLabel } from "./priority-icon";
+import { CreateIssue } from "./create-issue";
 import { LabelPill } from "./label-pill";
 import type { IssueStatus, Priority } from "../types";
 
@@ -20,6 +21,7 @@ export function IssueDetail() {
   const [editing, setEditing] = useState<"title" | "description" | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editDesc, setEditDesc] = useState("");
+  const [showDuplicate, setShowDuplicate] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   if (!issue) return null;
@@ -68,6 +70,7 @@ export function IssueDetail() {
           </button>
           <span class="issue-detail-identifier">{issue.identifier}</span>
           <div style={{ marginLeft: "auto", display: "flex", gap: "6px" }}>
+            <button class="btn btn-sm" onClick={() => setShowDuplicate(true)} aria-label="Duplicate issue">Duplicate issue</button>
             {confirmDelete ? (
               <span class="confirm-bar">
                 Delete this issue?
@@ -81,6 +84,8 @@ export function IssueDetail() {
             )}
           </div>
         </div>
+
+        {showDuplicate && <CreateIssue initialIssue={issue} onClose={() => setShowDuplicate(false)} onCreated={selectIssue} />}
 
         {/* Title */}
         {editing === "title" ? (

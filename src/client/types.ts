@@ -1,4 +1,4 @@
-export type View = "issues" | "projects";
+export type View = "issues" | "projects" | "overview";
 
 export type IssueStatus = "backlog" | "todo" | "in_progress" | "done" | "cancelled";
 export type Priority = "none" | "urgent" | "high" | "medium" | "low";
@@ -74,4 +74,10 @@ export interface ProjectLookup {
   id: number;
   name: string;
   icon: string;
+}
+
+export interface Workload {
+  totals: { active: number; overdue: number; upcoming: number; unprojected: number };
+  statuses: { status: IssueStatus; count: number }[];
+  deadlines: { id: number; identifier: string; title: string; due_date: string; priority: Priority; overdue: number }[];
 }

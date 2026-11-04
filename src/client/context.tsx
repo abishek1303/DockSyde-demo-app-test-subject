@@ -19,7 +19,8 @@ export interface AppContextValue {
   setIssuesPage: (page: number) => void;
   issuesSearch: string;
   setIssuesSearch: (s: string) => void;
-  addIssue: (data: { title: string; description?: string; status?: IssueStatus; priority?: Priority; project_id?: number | null; due_date?: string }) => Promise<void>;
+  addIssue: (data: { title: string; description?: string; status?: IssueStatus; priority?: Priority; project_id?: number | null; due_date?: string }) => Promise<Issue>;
+  bulkUpdateIssues: (ids: number[], data: { status?: IssueStatus; priority?: Priority }) => Promise<void>;
   updateIssue: (id: number, data: Partial<Issue>) => Promise<void>;
   deleteIssue: (id: number) => Promise<void>;
 

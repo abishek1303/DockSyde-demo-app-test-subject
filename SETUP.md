@@ -74,3 +74,39 @@ rules), so that pair does not demonstrate a user-facing product change. Select
 an explicit base/head comparison rather than that merge's immediate parent.
 The new feature commits must be available on GitHub before remote analysis can
 resolve them; local checkout changes alone do not update the remote branch.
+
+
+The tip feature also extends issue search to descriptions. For an immediate-parent
+Latest Changes demo, use the latest changes-test commit: it contains the API query
+and visible search hint changes together. Search a word present only in an issue's
+description to demonstrate the added capability. No startup configuration changes.
+
+
+## Expanded feature demo on changes-test
+
+The latest feature commit combines Workload overview, bulk triage, duplication,
+project-description editing, and description search with their source changes.
+Selecting changes-test in Latest Changes now selects a product-changing tip.
+The previous head `9c75d51` is the immediate-parent baseline for this feature set;
+use `8810bfc` when comparing with documents from the successful remote main scan.
+
+Suggested walkthrough:
+1. Open `/?agent&view=overview`, inspect live counts and the deadline queue.
+2. Review overdue issues, then select several issues in My Issues and apply
+   a shared status/priority. Return to Workload to see the updated counts.
+3. Open an issue, Duplicate issue, review the draft, and save a follow-up.
+4. In Projects, edit a description, save, and reload to confirm persistence.
+5. Search a keyword that appears only in an issue description.
+
+New endpoints are `GET /api/workload` and `POST /api/issues/bulk`. They use the
+existing local database; no schema migration or new package is required. The
+inspection workflow version 3 visits Workload and bulk-triage controls without
+modifying records. Existing source-based model/validation behavior is unchanged.
+
+With `pnpm dev` running, execute `node --test tests/workspace.integration.mjs`.
+This uses Node's built-in test runner and temporary local records, cleaned up
+in finally. It verifies workspace counts, deadline exclusions, bulk input limits,
+combined updates, duplicate IDs, and all-or-nothing behavior for missing records.
+Playwright separately verifies drill-downs, persistence, selection reset, failed
+bulk-save recovery, dashboard refresh/retry, and the earlier intake/copy/project
+workflows. Existing TypeScript diagnostics remain unchanged apart from line numbers.

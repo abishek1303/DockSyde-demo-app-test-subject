@@ -914,3 +914,26 @@ tr:hover .actions-cell { opacity: 1; }
 .demo-board .issue-row-meta { flex-basis:100%; }
 
 .project-description { margin: 6px 0 0; max-width: 32rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* Workspace planning and triage share the existing card and control theme. */
+.workload-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; padding: 24px; }
+.workload-metric { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+.workload-metric h2, .workload-panel h2 { font-size: 15px; }
+.workload-metric > strong { font-size: 36px; line-height: 1.2; }
+.workload-metric p, .workload-panel > p { font-size: 12px; color: var(--text-secondary); }
+.workload-panels { display: grid; grid-template-columns: minmax(200px, 1fr) minmax(0, 2fr); gap: 20px; padding: 0 24px 24px; }
+.workload-panel { padding: 20px; }
+.workload-status, .workload-deadline { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 16px; text-align: left; padding: 14px 0; border: 0; border-bottom: 1px solid var(--border); background: transparent; color: var(--text); cursor: pointer; font: inherit; }
+.workload-status:hover, .workload-deadline:hover { background: var(--row-hover); }
+.workload-deadline strong, .workload-deadline small { display: block; overflow-wrap: anywhere; }
+.workload-deadline small { color: var(--text-secondary); font-size: 11px; }
+.deadline-overdue { color: var(--danger); font-size: 12px; }
+.workload-message { padding: 20px; }
+.bulk-triage { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 16px 24px; border-bottom: 1px solid var(--border); background: var(--card-bg); }
+.bulk-triage label { display: flex; align-items: center; gap: 8px; }
+.bulk-triage select { padding: 8px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--card-bg); color: var(--text); }
+.bulk-feedback { padding: 12px 24px; }
+.selectable-issue { display: flex; align-items: center; gap: 8px; padding-left: 16px; }
+.selectable-issue > .issue-row { flex: 1; min-width: 0; }
+@media (max-width: 900px) { .workload-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } .workload-panels { grid-template-columns: 1fr; } }
+@media (max-width: 520px) { .workload-metrics { grid-template-columns: 1fr; } }

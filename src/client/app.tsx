@@ -4,6 +4,7 @@ import { useAppState } from "./hooks/use-app";
 import { Sidebar } from "./components/sidebar";
 import { IssueList } from "./components/issue-list";
 import { IssueDetail } from "./components/issue-detail";
+import { WorkloadOverview } from "./components/workload-overview";
 import { ProjectList } from "./components/project-list";
 import { ErrorBanner } from "./components/error-banner";
 
@@ -23,6 +24,7 @@ export function App() {
 
   const renderMain = () => {
     if (appState.selectedIssue) return <IssueDetail />;
+    if (appState.view === "overview") return <WorkloadOverview />;
     if (appState.view === "projects") return <ProjectList />;
     return <IssueList />;
   };

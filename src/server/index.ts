@@ -140,6 +140,69 @@ app.openapi(getStats, async (c) => {
   }
 });
 
+// Workspace-wide counts are computed before issue-list pagination. Dates use UTC,
+// matching the existing overdue filter; finished/cancelled work is excluded.
+const WorkloadTotalsSchema = z.object({ active: z.number().int(), overdue: z.number().int(), upcoming: z.number().int(), unprojected: z.number().int() });
+const WorkloadStatusSchema = z.object({ status: z.string(), count: z.number().int() });
+const WorkloadDeadlineSchema = z.object({ id: z.number().int(), identifier: z.string(), title: z.string(), due_date: z.string(), priority: z.string(), overdue: z.number().int() });
+const WorkloadSchema = z.object({ totals: WorkloadTotalsSchema, statuses: z.array(WorkloadStatusSchema), deadlines: z.array(WorkloadDeadlineSchema) });
+const workloadRoute = createRoute({
+  method: "get", path: "/api/workload", tags: ["Workspace"], summary: "Workspace workload and approaching deadlines",
+  responses: {
+    200: { description: "Live workload, including up to ten earliest deadlines", content: { "application/json": { schema: WorkloadSchema } } },
+    500: { description: "Server error", content: { "application/json": { schema: ErrorSchema } } },
+  },
+});
+app.openapi(workloadRoute, async c => {
+  try {
+    const totals = await get<z.infer<typeof WorkloadTotalsSchema>>(`SELECT
+      COUNT(*) AS active,
+      COALESCE(SUM(due_date != '' AND due_date < date('now')), 0) AS overdue,
+      COALESCE(SUM(due_date BETWEEN date('now') AND date('now', '+7 days')), 0) AS upcoming,
+      COALESCE(SUM(project_id IS NULL), 0) AS unprojected
+      FROM issues WHERE status NOT IN ('done', 'cancelled')`);
+    const statuses = await query<z.infer<typeof WorkloadStatusSchema>>("SELECT status, COUNT(*) AS count FROM issues GROUP BY status");
+    const deadlines = await query<z.infer<typeof WorkloadDeadlineSchema>>(`SELECT id, identifier, title, due_date, priority,
+      CASE WHEN due_date < date('now') THEN 1 ELSE 0 END AS overdue
+      FROM issues WHERE status NOT IN ('done', 'cancelled') AND due_date != '' AND due_date <= date('now', '+7 days')
+      ORDER BY due_date, id LIMIT 10`);
+    return c.json({ totals: totals ?? { active: 0, overdue: 0, upcoming: 0, unprojected: 0 }, statuses, deadlines }, 200);
+  } catch (e) { return c.json({ error: (e as Error).message }, 500); }
+});
+
+const bulkIssueUpdate = createRoute({
+  method: "post", path: "/api/issues/bulk", tags: ["Issues"], summary: "Change status or priority for up to 100 issues atomically",
+  request: { body: { required: true, content: { "application/json": { schema: z.object({
+    ids: z.array(z.number().int().positive()).min(1).max(100),
+    status: z.enum(["backlog", "todo", "in_progress", "done", "cancelled"]).optional(),
+    priority: z.enum(["none", "urgent", "high", "medium", "low"]).optional(),
+  }).strict() } } } },
+  responses: {
+    200: { description: "Updated issue IDs", content: { "application/json": { schema: z.object({ updatedIds: z.array(z.number().int()) }) } } },
+    400: { description: "Invalid update", content: { "application/json": { schema: ErrorSchema } } },
+    404: { description: "An issue no longer exists; nothing changed", content: { "application/json": { schema: ErrorSchema } } },
+    500: { description: "Server error", content: { "application/json": { schema: ErrorSchema } } },
+  },
+});
+app.openapi(bulkIssueUpdate, async c => {
+  try {
+    const body = c.req.valid("json");
+    if (body.status === undefined && body.priority === undefined) return c.json({ error: "Choose a status or priority to update." }, 400);
+    const ids = [...new Set(body.ids)];
+    const fields: string[] = [], values: unknown[] = [];
+    if (body.status !== undefined) { fields.push("status = ?"); values.push(body.status); }
+    if (body.priority !== undefined) { fields.push("priority = ?"); values.push(body.priority); }
+    fields.push("updated_at = datetime('now')");
+    const placeholders = ids.map(() => "?").join(",");
+    // One SQL statement prevents partial edits if any selected issue disappeared.
+    const updated = await query<{ id: number }>(`UPDATE issues SET ${fields.join(", ")}
+      WHERE id IN (${placeholders}) AND (SELECT COUNT(*) FROM issues WHERE id IN (${placeholders})) = ?
+      RETURNING id`, [...values, ...ids, ...ids, ids.length]);
+    if (updated.length !== ids.length) return c.json({ error: "An issue no longer exists. Refresh the list and select again; no issues were changed." }, 404);
+    return c.json({ updatedIds: updated.map(row => row.id) }, 200);
+  } catch (e) { return c.json({ error: (e as Error).message }, 500); }
+});
+
 // ── Issues ─────────────────────────────────────────────────────────
 
 const listIssues = createRoute({
@@ -151,7 +214,7 @@ const listIssues = createRoute({
     query: z.object({
       page: z.string().optional().openapi({ description: "Page number (default: 1)" }),
       limit: z.string().optional().openapi({ description: "Items per page (default: 50, max: 100)" }),
-      search: z.string().optional().openapi({ description: "Search by title or identifier" }),
+      search: z.string().optional().openapi({ description: "Search by title, identifier, or description" }),
       status: z.string().optional().openapi({ description: "Filter by status (todo, in_progress, done, backlog, cancelled)" }),
       priority: z.enum(["urgent", "high", "medium", "low", "none"]).optional(),
       overdue: z.enum(["true"]).optional(),
@@ -183,8 +246,8 @@ app.openapi(listIssues, async (c) => {
     const whereParams: unknown[] = [];
 
     if (q.search) {
-      whereClauses.push("(i.title LIKE ? OR i.identifier LIKE ?)");
-      whereParams.push(`%${q.search}%`, `%${q.search}%`);
+      whereClauses.push("(i.title LIKE ? OR i.identifier LIKE ? OR i.description LIKE ?)");
+      whereParams.push(`%${q.search}%`, `%${q.search}%`, `%${q.search}%`);
     }
     if (q.status) {
       whereClauses.push("i.status = ?");
