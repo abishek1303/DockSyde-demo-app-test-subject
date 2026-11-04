@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "preact/hooks";
+import { useState, useRef, useCallback, useEffect } from "preact/hooks";
 import { Plus, Search } from "lucide-preact";
 import { useApp } from "../context";
 import { IssueRow } from "./issue-row";
@@ -12,10 +12,12 @@ const STATUS_ORDER: IssueStatus[] = ["in_progress", "todo", "backlog", "done", "
 export function IssueList() {
   const { issues, issuesPag, setIssuesPage, issuesSearch, setIssuesSearch, selectIssue, stats, filters, setFilters, projectLookup } = useApp();
   const [layout, setLayout] = useState("list");
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState(issuesSearch);
   const [showCreate, setShowCreate] = useState(false);
   const [collapsed, setCollapsed] = useState<Set<IssueStatus>>(new Set());
   const timerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
 
   const handleSearch = useCallback((value: string) => {
     setSearchValue(value);
@@ -56,7 +58,7 @@ export function IssueList() {
             <input
               class="search-input"
               type="text"
-              placeholder="Search issues..."
+              placeholder="Search title or identifier..."
               value={searchValue}
               onInput={(e) => handleSearch((e.target as HTMLInputElement).value)}
               aria-label="Search issues"
@@ -84,13 +86,14 @@ export function IssueList() {
         <button class="btn" onClick={() => { setFilters({status: "", priority: "", project_id: "", overdue: ""}); handleSearch(""); }}>Clear filters</button>
         <button class="btn" aria-pressed={layout === "board"} onClick={() => setLayout(layout === "list" ? "board" : "list")}>{layout === "list" ? "Board view" : "List view"}</button>
       </div>
-      <div class="demo-summary" aria-live="polite">
-        <strong>{issuesPag.total} matching issues</strong>
+      <div class="demo-summary" role="status" aria-live="polite">
+        <strong>{issuesPag.total} matching issues{issuesSearch && ` for “${issuesSearch}”`}</strong>
         <span>On this page: {issues.filter(i => i.status === "in_progress").length} in progress</span>
         <span>{issues.filter(i => i.status === "done").length} completed</span>
         <span>{issues.filter(i => ["urgent", "high"].includes(i.priority) && !["done", "cancelled"].includes(i.status)).length} need attention</span>
       </div>
-      {issues.length === 0 && <p class="empty-group">No matching issues. Clear the filters or create an issue to get started.</p>}
+      {issuesSearch && <button class="btn btn-sm" onClick={() => { if (timerRef.current) clearTimeout(timerRef.current); setSearchValue(""); setIssuesSearch(""); }} aria-label="Clear search">Clear search</button>}
+      {issues.length === 0 && <p class="empty-group">No matching issues. Try another title or identifier, clear the filters, or create an issue.</p>}
       <div class={layout === "board" ? "issue-groups demo-board" : "issue-groups"}>
         {STATUS_ORDER.map((status) => {
           const group = grouped.get(status) || [];
