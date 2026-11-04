@@ -60,3 +60,17 @@ No schema migration, package changes, or dependency installation are required.
 Verification: production build and Playwright intake checks passed, including
 blank optional fields, required title, and saved values after reload. Existing
 TypeScript diagnostics remain identical (15 server errors).
+
+### Baseline matching the saved main scan
+
+The subsequently verified successful run `85abcbea-3513-4625-9be7-d9ac10515c91`
+scanned remote main at `8810bfc4e75f3d5e84824efffcd062683e2150ee`.
+Use that immutable SHA as the base when demonstrating changes against those saved
+documents. This comparison includes the filters/board, search feedback, project
+context, and issue intake changes. The narrower `f291546` base isolates intake.
+
+The prior change test compared `6223397` with `4e2191a` (the merge adding ignore
+rules), so that pair does not demonstrate a user-facing product change. Select
+an explicit base/head comparison rather than that merge's immediate parent.
+The new feature commits must be available on GitHub before remote analysis can
+resolve them; local checkout changes alone do not update the remote branch.
