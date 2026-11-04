@@ -3,3 +3,6 @@ dist/
 data.db
 data.db-shm
 data.db-wal
+
+# Local Cloudflare D1 state and development cache
+.wrangler/
